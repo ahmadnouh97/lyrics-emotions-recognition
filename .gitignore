@@ -5,4 +5,5 @@
 **/**/.dvc
 **/**/.ipynb_checkpoints
 data/
-model/
+model/*
+!model/*.dvc
