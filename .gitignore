@@ -1,0 +1,8 @@
+**/**/.ipynb_checkpoints
+**/**/__pycache__
+**/**/.vscode
+**/**/.idea
+**/**/.dvc
+**/**/.ipynb_checkpoints
+data/
+model/
