@@ -5,4 +5,8 @@
 **/**/.dvc
 **/**/.ipynb_checkpoints
 data/
-model/
+model/*
+!model/*.dvc
+**/**/*.mp3
+**/**/*.wav
+**/**/*.pkl
