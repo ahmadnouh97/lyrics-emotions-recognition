@@ -1,0 +1,30 @@
+train:
+  cmd: python Code/train.py
+  deps:
+  - path: Code/text_vectorization.py
+    md5: 7d25e067c67da8553f841b9c769fcc89
+  - path: Code/train.py
+    md5: e96b3aeb43084efb8c1fa8de51eec5a8
+  - path: data/processed/tweets.csv
+    md5: 8b0242579d529de387192383020375c7
+  params:
+    params.yaml:
+      train.batch_size: 64
+      train.dense_01_units: 50
+      train.dense_02_units: 50
+      train.dropout_factor: 0.2
+      train.embedding_dim: 100
+      train.epochs: 100
+      train.hidden_activation: tanh
+      train.input_length: 200
+      train.learning_rate: 0.0006
+      train.lstm_01_units: 100
+      train.lstm_02_units: 50
+      train.regularization_factor: 0.001
+      train.validation_split: 0.2
+      train.vocab_size: 10000
+  outs:
+  - path: ./metrics/metrics.json
+    md5: 17fee905f00888c6c9df4306d37153e6
+  - path: model/tweets_model
+    md5: 9de4ebcb7e8b4eb5cd5566fb9e93aa94.dir

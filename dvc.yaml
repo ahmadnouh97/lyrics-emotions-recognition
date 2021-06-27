@@ -1,0 +1,27 @@
+stages:
+  train:
+    cmd: python Code/train.py
+    deps:
+    - Code/text_vectorization.py
+    - Code/train.py
+    - data/processed/tweets.csv
+    params:
+    - train.batch_size
+    - train.dense_01_units
+    - train.dense_02_units
+    - train.embedding_dim
+    - train.epochs
+    - train.hidden_activation
+    - train.input_length
+    - train.learning_rate
+    - train.lstm_01_units
+    - train.lstm_02_units
+    - train.validation_split
+    - train.vocab_size
+    - train.regularization_factor
+    - train.dropout_factor
+    outs:
+    - model/tweets_model
+    metrics:
+    - ./metrics/metrics.json:
+        cache: true
