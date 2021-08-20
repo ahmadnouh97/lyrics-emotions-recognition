@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import tensorflow_addons as tfa
 import json
 
 # setup gpu
@@ -67,6 +68,11 @@ max_len = max([len(item) for item in X])
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
+val_len = int(len(X_train) * float(params["validation_split"]))
+
+print(f'X_train_len = {len(X_train) - val_len}')
+print(f'X_val_len = {val_len}')
+print(f'X_test_len = {len(X_test)}')
 
 text2vec_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(
     max_tokens=int(params['vocab_size']),
@@ -92,46 +98,53 @@ def create_model():
             input_dim=int(params['vocab_size']) + 1,
             output_dim=int(params['embedding_dim']),
             # Use masking to handle the variable sequence lengths
-            # mask_zero=True
-            input_length=int(params['input_length']))
+            mask_zero=True
+            # input_length=int(params['input_length'])
+        )
     )
 
     _model.add(
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(int(params['lstm_01_units']), return_sequences=True,
-                                                           activation=params['hidden_activation'],
-                                                           recurrent_regularizer=tf.keras.regularizers.L2(
-                                                               float(params['regularization_factor'])),
-                                                           kernel_regularizer=tf.keras.regularizers.L2(
-                                                               float(params['regularization_factor']))))
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(int(params['lstm_01_units']),
+                                                           # return_sequences=True,
+                                                           # activation=params['hidden_activation'],
+                                                           # recurrent_regularizer=tf.keras.regularizers.L2(
+                                                           #     float(params['regularization_factor'])),
+                                                           # kernel_regularizer=tf.keras.regularizers.L2(
+                                                           #     float(params['regularization_factor']))
+                                                           )
+                                      )
     )
 
-    _model.add(
-        tf.keras.layers.Bidirectional(
-            tf.keras.layers.LSTM(int(params['lstm_02_units']),
-                                 activation=params['hidden_activation'],
-                                 recurrent_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])),
-                                 kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor']))))
-    )
-    _model.add(
-        tf.keras.layers.Dropout(float(params['dropout_factor']))
-    )
+    # _model.add(
+    #     tf.keras.layers.Bidirectional(
+    #         tf.keras.layers.LSTM(int(params['lstm_02_units']),
+    #                              activation=params['hidden_activation'],
+    #                              recurrent_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])),
+    #                              kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor']))
+    #                              )
+    #     )
+    # )
+    # _model.add(
+    #     tf.keras.layers.Dropout(float(params['dropout_factor']))
+    # )
 
     _model.add(
         tf.keras.layers.Dense(int(params['dense_01_units']),
                               activation=params['hidden_activation'],
-                              kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])))
+                              # kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor']))
+                              )
     )
-    _model.add(
-        tf.keras.layers.Dropout(float(params['dropout_factor']))
-    )
-    _model.add(
-        tf.keras.layers.Dense(int(params['dense_02_units']),
-                              activation=params['hidden_activation'],
-                              kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])))
-    )
-    _model.add(
-        tf.keras.layers.Dropout(float(params['dropout_factor']))
-    )
+    # _model.add(
+    #     tf.keras.layers.Dropout(float(params['dropout_factor']))
+    # )
+    # _model.add(
+    #     tf.keras.layers.Dense(int(params['dense_02_units']),
+    #                           activation=params['hidden_activation'],
+    #                           kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])))
+    # )
+    # _model.add(
+    #     tf.keras.layers.Dropout(float(params['dropout_factor']))
+    # )
     _model.add(
         tf.keras.layers.Dense(1, activation='sigmoid')
     )
@@ -140,11 +153,14 @@ def create_model():
 
 with tf.device('/GPU:0'):
     model = create_model()
-
+    print('model created')
     model.compile(
         loss='binary_crossentropy',
         optimizer=tf.keras.optimizers.Adam(learning_rate=float(params['learning_rate'])),
-        metrics=['accuracy']
+        metrics=[
+            'accuracy'
+            # tfa.metrics.F1Score(num_classes=1)
+        ]
     )
     early_stopping_cp = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
                                                          patience=5, restore_best_weights=True)

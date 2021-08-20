@@ -19,7 +19,7 @@ data = data.sort_values(['songID', 'LyricsOrder'], ascending=True).groupby(['son
     'SongDialect': 'first',
 }).reset_index()
 
-print(data.head())
+# print(data.head())
 print(f'number of songs = {len(data)}')
 
 raw_lyrics = list(data['Lyrics'])

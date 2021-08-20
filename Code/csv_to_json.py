@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath('.'))
 from Code.config import Config
 
 data = pd.read_csv(os.path.join(Config.PROCESSED_DATA_DIR, 'habibi_labeled.csv'), index_col=False, encoding="utf-8")
-data = data[['songID', 'Singer', 'Lyrics', 'Label', 'SongDialect']]
+data = data[['songID', 'SongTitle', 'Singer', 'Lyrics', 'Label', 'SongDialect']]
 
 parts = np.array_split(data, 5)
 

@@ -1,14 +1,14 @@
 train:
   vocab_size: 10000
   input_length: 200
-  embedding_dim: 100
-  learning_rate: 0.001
+  embedding_dim: 64
+  learning_rate: 0.0001
   validation_split: 0.2
-  epochs: 100
-  batch_size: 64
-  lstm_01_units: 100
+  epochs: 15
+  batch_size: 32
+  lstm_01_units: 64
   lstm_02_units: 50
-  dense_01_units: 50
+  dense_01_units: 64
   dense_02_units: 50
   hidden_activation: "tanh"
   regularization_factor: 0.001
