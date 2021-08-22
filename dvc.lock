@@ -1,5 +1,29 @@
 schema: '2.0'
 stages:
+  prepare:
+    cmd: python Code/preprocess_tweets_data.py
+    deps:
+    - path: Code/preprocess_tweets_data.py
+      md5: 8c67babbcc16264953e391c6aaca88e5
+      size: 1745
+    - path: data/raw/tweets.csv
+      md5: 384386e393d97a66a2ea566e6e2377e1
+      size: 16381741
+    params:
+      params.yaml:
+        prepare.normalize: 0
+        prepare.remove_nonarabic: 1
+        prepare.remove_punc: 1
+        prepare.remove_repeats: 0
+        prepare.remove_shadda: 1
+        prepare.remove_stopwords: 0
+        prepare.remove_tashkeel: 1
+        prepare.remove_tatweel: 1
+        prepare.stemming: 0
+    outs:
+    - path: data/processed/tweets.csv
+      md5: 2a6c5eaa5ecf0387bfadfc1215e8258e
+      size: 6024390
   train:
     cmd: python Code/train.py
     deps:
@@ -7,32 +31,73 @@ stages:
       md5: 7d25e067c67da8553f841b9c769fcc89
       size: 1545
     - path: Code/train.py
-      md5: cdfc8ce8ab506ddf4c8cb15091c926f2
-      size: 6383
+      md5: fa96442823a72768597753db5212f76b
+      size: 3679
     - path: data/processed/tweets.csv
       md5: 2a6c5eaa5ecf0387bfadfc1215e8258e
       size: 6024390
     params:
       params.yaml:
         train.batch_size: 32
-        train.dense_01_units: 64
-        train.dense_02_units: 50
+        train.bi_lstm_units:
+        - 64
+        train.dense_units:
+        - 64
         train.dropout_factor: 0.2
         train.embedding_dim: 64
         train.epochs: 15
         train.hidden_activation: tanh
         train.input_length: 200
         train.learning_rate: 0.0001
-        train.lstm_01_units: 64
-        train.lstm_02_units: 50
         train.regularization_factor: 0.001
         train.validation_split: 0.2
         train.vocab_size: 10000
     outs:
-    - path: ./metrics/metrics.json
-      md5: 66e7e68346a2b1827abfd70f28123199
-      size: 60
-    - path: model/tweets_model
-      md5: 1ae5e28b475dcd614cee2e1b8554bf48.dir
-      size: 15983644
+    - path: model/lyrics_model
+      md5: 7550724804b2bfa18b3aa6edac31889e.dir
+      size: 16212219
       nfiles: 4
+  evaluate:
+    cmd: python Code/evaluate.py
+    deps:
+    - path: Code/evaluate.py
+      md5: 6db043f741fb422ba401b54912636aa6
+      size: 4504
+    - path: data/eval/eval.json
+      md5: b9c2383541a44f6efb7b21e1016d985d
+      size: 144998
+    - path: model/lyrics_model
+      md5: 7550724804b2bfa18b3aa6edac31889e.dir
+      size: 16212219
+      nfiles: 4
+    outs:
+    - path: metrics/f1_score.json
+      md5: 727b106bd71a8b9aa7108db322f5f366
+      size: 32
+    - path: metrics/happy_f1_score.json
+      md5: 157b5d96e403502bd608945c6e4d3042
+      size: 32
+    - path: metrics/happy_precision.json
+      md5: 68b58aed0ba357c2231186f287c6d0c6
+      size: 33
+    - path: metrics/happy_recall.json
+      md5: c34712de663889ba2c7f9e825a2697ad
+      size: 16
+    - path: metrics/precision.json
+      md5: c82fb6ed7c17b3a4eeca34917e18a67f
+      size: 32
+    - path: metrics/recall.json
+      md5: e4c186fd2dfd95dc03519921771f7e55
+      size: 18
+    - path: metrics/sad_f1_score.json
+      md5: 3cd359c76ac4624933435c0a10854c17
+      size: 32
+    - path: metrics/sad_precision.json
+      md5: 11da271b22db97ec308060f411e681c5
+      size: 20
+    - path: metrics/sad_recall.json
+      md5: 5ae5602a55335249ae79dce65aedb40f
+      size: 16
+    - path: plots/classes.csv
+      md5: aa39e2f2be781cd16ce301b791dffbc5
+      size: 1138

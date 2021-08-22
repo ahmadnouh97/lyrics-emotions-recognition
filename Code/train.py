@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath('.'))
 from Code.config import Config
 from Code.text_vectorization import standardize_ar_text, split_ar_text
-
+from Code.models import build_bi_lstm_model
 params = yaml.safe_load(open(Config.PARAMS_PATH))['train']
 
 # os.makedirs(Config.TENSORBOARD_DIR, exist_ok=True)
@@ -61,18 +61,14 @@ print(f'class_count:\n{data["Class"].value_counts()}')
 
 data['Class'] = data['Class'].replace({'happiness': 1.0, 'sadness': 0.0})
 
-X = np.array(list(data['Tweet'])).astype(str)
+x = np.array(list(data['Tweet'])).astype(str)
 y = np.array(list(data['Class']))
 
-max_len = max([len(item) for item in X])
+max_len = max([len(item) for item in x])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-val_len = int(len(X_train) * float(params["validation_split"]))
-
-print(f'X_train_len = {len(X_train) - val_len}')
-print(f'X_val_len = {val_len}')
-print(f'X_test_len = {len(X_test)}')
+print(f'x = {len(x)}')
 
 text2vec_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(
     max_tokens=int(params['vocab_size']),
@@ -81,78 +77,19 @@ text2vec_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(
     output_sequence_length=int(params['input_length'])
 )
 
-text2vec_layer.adapt(X_train)
-
-vocab_size = len(text2vec_layer.get_vocabulary())
-
-
-def create_model():
-    _model = tf.keras.Sequential()
-
-    _model.add(tf.keras.Input(shape=(1,), dtype=tf.string))
-
-    _model.add(text2vec_layer)
-
-    _model.add(
-        tf.keras.layers.Embedding(
-            input_dim=int(params['vocab_size']) + 1,
-            output_dim=int(params['embedding_dim']),
-            # Use masking to handle the variable sequence lengths
-            mask_zero=True
-            # input_length=int(params['input_length'])
-        )
-    )
-
-    _model.add(
-        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(int(params['lstm_01_units']),
-                                                           # return_sequences=True,
-                                                           # activation=params['hidden_activation'],
-                                                           # recurrent_regularizer=tf.keras.regularizers.L2(
-                                                           #     float(params['regularization_factor'])),
-                                                           # kernel_regularizer=tf.keras.regularizers.L2(
-                                                           #     float(params['regularization_factor']))
-                                                           )
-                                      )
-    )
-
-    # _model.add(
-    #     tf.keras.layers.Bidirectional(
-    #         tf.keras.layers.LSTM(int(params['lstm_02_units']),
-    #                              activation=params['hidden_activation'],
-    #                              recurrent_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])),
-    #                              kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor']))
-    #                              )
-    #     )
-    # )
-    # _model.add(
-    #     tf.keras.layers.Dropout(float(params['dropout_factor']))
-    # )
-
-    _model.add(
-        tf.keras.layers.Dense(int(params['dense_01_units']),
-                              activation=params['hidden_activation'],
-                              # kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor']))
-                              )
-    )
-    # _model.add(
-    #     tf.keras.layers.Dropout(float(params['dropout_factor']))
-    # )
-    # _model.add(
-    #     tf.keras.layers.Dense(int(params['dense_02_units']),
-    #                           activation=params['hidden_activation'],
-    #                           kernel_regularizer=tf.keras.regularizers.L2(float(params['regularization_factor'])))
-    # )
-    # _model.add(
-    #     tf.keras.layers.Dropout(float(params['dropout_factor']))
-    # )
-    _model.add(
-        tf.keras.layers.Dense(1, activation='sigmoid')
-    )
-    return _model
-
+text2vec_layer.adapt(x)
 
 with tf.device('/GPU:0'):
-    model = create_model()
+    model = build_bi_lstm_model(
+        text2vec_layer,
+        vocab_size=int(params['vocab_size']),
+        embedding_dim=int(params['embedding_dim']),
+        bi_lstm_units=list(params['bi_lstm_units']),
+        dense_units=list(params['dense_units']),
+        hidden_activation=str(params['hidden_activation']),
+        regularization_factor=float(params['regularization_factor']),
+        dropout_factor=float(params['dropout_factor'])
+    )
     print('model created')
     model.compile(
         loss='binary_crossentropy',
@@ -165,8 +102,8 @@ with tf.device('/GPU:0'):
                                                          patience=5, restore_best_weights=True)
 
     history = model.fit(
-        X_train,
-        y_train,
+        x,
+        y,
         validation_split=float(params['validation_split']),
         epochs=int(params['epochs']),
         batch_size=int(params['batch_size']),
@@ -178,7 +115,3 @@ with tf.device('/GPU:0'):
     model.save(Config.MODEL_PATH)
     plot_training_history(history)
 
-    # metrics = model.evaluate(x=X_test, y=y_test, return_dict=True)
-    #
-    # with open(os.path.join(Config.METRICS_DIR, 'metrics.json'), 'w') as file:
-    #     json.dump(metrics, file)

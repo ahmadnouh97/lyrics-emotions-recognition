@@ -1,16 +1,20 @@
 import os
 import sys
 import yaml
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import json
+from tqdm import tqdm
 from sklearn.metrics import classification_report, f1_score, precision_score, recall_score, accuracy_score
 
 sys.path.append(os.path.abspath('.'))
 from Code.config import Config
 from Code.text_vectorization import standardize_ar_text, split_ar_text
+from Code.preprocessing import process_text
+
+with open(Config.PARAMS_PATH) as f:
+    params = yaml.load(f.read())['prepare']
 
 
 def prepare_data():
@@ -19,16 +23,44 @@ def prepare_data():
 
 data = prepare_data()
 
-x_test = np.array(list(data['lyrics']))
-y_test = np.array(list(data['actual']))
+processed_lyrics = []
+with tqdm(total=len(data)) as p_bar:
+    for lyrics in list(data['Lyrics']):
+        processed_lyrics.append(
+            process_text(str(lyrics),
+                         remove_stopwords=bool(params['remove_stopwords']),
+                         remove_shadda=bool(params['remove_shadda']),
+                         remove_tashkeel=bool(params['remove_tashkeel']),
+                         remove_tatweel=bool(params['remove_tatweel']),
+                         remove_punc=bool(params['remove_punc']),
+                         remove_repeats=bool(params['remove_repeats']),
+                         normalize=bool(params['normalize']),
+                         remove_nonarabic=bool(params['remove_nonarabic']),
+                         stemming=bool(params['stemming']))
+        )
+        p_bar.update(1)
+
+data['Lyrics'] = processed_lyrics
+# data['Label'] = data['Label'].replace({'Happy': 1.0, 'Sad': 0.0})
+
+x_test = np.array(list(data['Lyrics']))
+y_test = np.array(list(data['Label']))
 
 model = tf.keras.models.load_model(Config.MODEL_PATH)
 
 predictions = model.predict(x_test)
 
-y_pred = [row.argmax() for row in predictions]
+y_pred = ['Happy' if val >= 0.5 else 'Sad' for val in predictions.reshape(-1)]
+
+
+predictions_dict = {
+    'actual': y_test,
+    'predicted': y_pred
+}
 
 class_report = classification_report(y_test, y_pred, output_dict=True)
+
+print(class_report)
 
 accuracy = {
     'f1-accuracy': accuracy_score(y_test, y_pred)
@@ -102,4 +134,12 @@ with open(os.path.join(Config.METRICS_DIR, 'sad_precision.json'), 'w') as file:
 with open(os.path.join(Config.METRICS_DIR, 'sad_recall.json'), 'w') as file:
     json.dump(sad_recall_metrics, file)
 
+
 # ---------------------------------------------------------------------------
+def save_to_csv(obj, file_path):
+    key = list(obj.keys())[0]
+    df = pd.DataFrame(obj, index=list(range(len(obj.get(key)))))
+    df.to_csv(file_path, index=False)
+
+
+save_to_csv(predictions_dict, os.path.join(Config.PLOT_DIR, 'classes.csv'))

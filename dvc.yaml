@@ -24,21 +24,25 @@ stages:
     - data/processed/tweets.csv
     params:
     - train.batch_size
-    - train.dense_01_units
-    - train.dense_02_units
+    - train.dense_units
     - train.embedding_dim
     - train.epochs
     - train.hidden_activation
     - train.input_length
     - train.learning_rate
-    - train.lstm_01_units
-    - train.lstm_02_units
+    - train.bi_lstm_units
     - train.validation_split
     - train.vocab_size
     - train.regularization_factor
     - train.dropout_factor
     outs:
-    - model/tweets_model
+    - model/lyrics_model
+  evaluate:
+    cmd: python Code/evaluate.py
+    deps:
+      - model/lyrics_model
+      - data/eval/eval.json
+      - Code/evaluate.py
     metrics:
     - metrics/f1_score.json
     - metrics/precision.json
@@ -49,3 +53,10 @@ stages:
     - metrics/sad_f1_score.json
     - metrics/sad_precision.json
     - metrics/sad_recall.json
+    plots:
+    - plots/classes.csv:
+        template: confusion
+        title: Confusion Matrix
+        cache: false
+        x: predicted
+        y: actual

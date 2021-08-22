@@ -1,1 +1,10 @@
 /metrics.json
+/f1_score.json
+/precision.json
+/recall.json
+/happy_f1_score.json
+/happy_precision.json
+/happy_recall.json
+/sad_f1_score.json
+/sad_precision.json
+/sad_recall.json
