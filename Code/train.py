@@ -23,7 +23,7 @@ from Code.text_vectorization import standardize_ar_text, split_ar_text
 params = yaml.safe_load(open(Config.PARAMS_PATH))['train']
 
 # os.makedirs(Config.TENSORBOARD_DIR, exist_ok=True)
-os.makedirs(Config.METRICS_PATH, exist_ok=True)
+os.makedirs(Config.METRICS_DIR, exist_ok=True)
 
 
 def prepare_data():
@@ -159,7 +159,6 @@ with tf.device('/GPU:0'):
         optimizer=tf.keras.optimizers.Adam(learning_rate=float(params['learning_rate'])),
         metrics=[
             'accuracy'
-            # tfa.metrics.F1Score(num_classes=1)
         ]
     )
     early_stopping_cp = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
@@ -179,7 +178,7 @@ with tf.device('/GPU:0'):
     model.save(Config.MODEL_PATH)
     plot_training_history(history)
 
-    metrics = model.evaluate(x=X_test, y=y_test, return_dict=True)
-
-    with open(os.path.join(Config.METRICS_PATH, 'metrics.json'), 'w') as file:
-        json.dump(metrics, file)
+    # metrics = model.evaluate(x=X_test, y=y_test, return_dict=True)
+    #
+    # with open(os.path.join(Config.METRICS_DIR, 'metrics.json'), 'w') as file:
+    #     json.dump(metrics, file)

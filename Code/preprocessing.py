@@ -33,10 +33,10 @@ def normalize_arabic(text):
     text = re.sub("أ", "ا", text)
     text = re.sub("آ", "ا", text)
     text = re.sub("ا", "ا", text)
-    # text = re.sub("ى", "ي", text)
-    # text = re.sub("ؤ", "ء", text)
-    # text = re.sub("ئ", "ء", text)
-    # text = re.sub("ة", "ه", text)
+    text = re.sub("ى", "ي", text)
+    text = re.sub("ؤ", "ء", text)
+    text = re.sub("ئ", "ء", text)
+    text = re.sub("ة", "ه", text)
     text = re.sub("گ", "ك", text)
     return text
 
@@ -59,29 +59,48 @@ def rooting(text):
     return ' '.join(stems)
 
 
-def process_text(text):
+def process_text(text,
+                 remove_stopwords=False,
+                 remove_shadda=False,
+                 remove_tashkeel=False,
+                 remove_tatweel=False,
+                 remove_punc=False,
+                 remove_repeats=False,
+                 normalize=False,
+                 remove_nonarabic=False,
+                 stemming=False):
     # trim text
     text = text.strip()
     # remove stopwords
-    # text = re.sub(STOPWORD_PATTERN, '', text)
+    if remove_stopwords:
+        text = re.sub(STOPWORD_PATTERN, '', text)
     # strip decoration inside words
-    text = in_word_re.sub('', text)
+    if remove_punc:
+        text = in_word_re.sub('', text)
     # strip shadda
-    text = ar.strip_shadda(text)
+    if remove_shadda:
+        text = ar.strip_shadda(text)
     # strip tashkeel
-    text = ar.strip_tashkeel(text)
+    if remove_tashkeel:
+        text = ar.strip_tashkeel(text)
     # strip tatweel
-    text = ar.strip_tatweel(text)
+    if remove_tatweel:
+        text = ar.strip_tatweel(text)
     # remove punctuations
-    # text = remove_punctuations(text)
+    if remove_punc:
+        text = remove_punctuations(text)
     # normalize arabic letters
-    # text = normalize_arabic(text)
+    if normalize:
+        text = normalize_arabic(text)
     # remove repeating chars
-    # text = remove_repeating_char(text)
+    if remove_repeats:
+        text = remove_repeating_char(text)
     # remove non-arabic letters
-    text = re.sub(NON_ARABIC_LETTER, ' ', text)
+    if remove_nonarabic:
+        text = re.sub(NON_ARABIC_LETTER, ' ', text)
     # rooting text
-    # text = rooting(text)
+    if stemming:
+        text = rooting(text)
     # strip multiple spaces with single one
     text = ' '.join(text.split())
     return text

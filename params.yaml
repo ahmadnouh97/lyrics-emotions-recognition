@@ -1,3 +1,13 @@
+prepare:
+  remove_stopwords: 0
+  remove_shadda: 1
+  remove_tashkeel: 1
+  remove_tatweel: 1
+  remove_punc: 1
+  normalize: 0
+  remove_repeats: 0
+  remove_nonarabic: 1
+  stemming: 0
 train:
   vocab_size: 10000
   input_length: 200

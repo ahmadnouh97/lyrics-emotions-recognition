@@ -1,4 +1,21 @@
 stages:
+  prepare:
+    cmd: python Code/preprocess_tweets_data.py
+    deps:
+    - Code/preprocess_tweets_data.py
+    - data/raw/tweets.csv
+    params:
+    - prepare.remove_stopwords
+    - prepare.remove_shadda
+    - prepare.remove_tashkeel
+    - prepare.remove_tatweel
+    - prepare.remove_punc
+    - prepare.normalize
+    - prepare.remove_repeats
+    - prepare.remove_nonarabic
+    - prepare.stemming
+    outs:
+    - data/processed/tweets.csv
   train:
     cmd: python Code/train.py
     deps:
@@ -23,5 +40,12 @@ stages:
     outs:
     - model/tweets_model
     metrics:
-    - ./metrics/metrics.json:
-        cache: true
+    - metrics/f1_score.json
+    - metrics/precision.json
+    - metrics/recall.json
+    - metrics/happy_f1_score.json
+    - metrics/happy_precision.json
+    - metrics/happy_recall.json
+    - metrics/sad_f1_score.json
+    - metrics/sad_precision.json
+    - metrics/sad_recall.json
