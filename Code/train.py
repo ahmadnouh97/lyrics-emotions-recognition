@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath('.'))
 from Code.config import Config
 from Code.text_vectorization import standardize_ar_text, split_ar_text
-from Code.models import build_bi_lstm_model
+from Code.models import build_cnn_model
 params = yaml.safe_load(open(Config.PARAMS_PATH))['train']
 
 # os.makedirs(Config.TENSORBOARD_DIR, exist_ok=True)
@@ -80,11 +80,12 @@ text2vec_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(
 text2vec_layer.adapt(x)
 
 with tf.device('/GPU:0'):
-    model = build_bi_lstm_model(
+    model = build_cnn_model(
         text2vec_layer,
         vocab_size=int(params['vocab_size']),
         embedding_dim=int(params['embedding_dim']),
-        bi_lstm_units=list(params['bi_lstm_units']),
+        cnn_units=list(params['cnn_units']),
+        cnn_kernels=list(params['cnn_kernels']),
         dense_units=list(params['dense_units']),
         hidden_activation=str(params['hidden_activation']),
         regularization_factor=float(params['regularization_factor']),

@@ -30,7 +30,8 @@ stages:
     - train.hidden_activation
     - train.input_length
     - train.learning_rate
-    - train.bi_lstm_units
+    - train.cnn_units
+    - train.cnn_kernels
     - train.validation_split
     - train.vocab_size
     - train.regularization_factor

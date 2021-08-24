@@ -1,23 +1,24 @@
 prepare:
-  remove_stopwords: 0
+  remove_stopwords: 1
   remove_shadda: 1
   remove_tashkeel: 1
   remove_tatweel: 1
   remove_punc: 1
-  normalize: 0
-  remove_repeats: 0
+  normalize: 1
+  remove_repeats: 1
   remove_nonarabic: 1
   stemming: 0
 train:
   vocab_size: 10000
   input_length: 200
-  embedding_dim: 64
-  learning_rate: 0.0001
+  embedding_dim: 100
+  learning_rate: 0.0003
   validation_split: 0.2
   epochs: 100
   batch_size: 32
-  bi_lstm_units: [64]
-  dense_units: [64]
+  cnn_units: [32]
+  cnn_kernels: [3]
+  dense_units: [32, 32]
   hidden_activation: "relu"
   regularization_factor: 0.001
-  dropout_factor: 0
+  dropout_factor: 0.2
