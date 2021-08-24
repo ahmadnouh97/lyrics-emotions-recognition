@@ -1,9 +1,9 @@
 stages:
   prepare:
-    cmd: python Code/preprocess_tweets_data.py
+    cmd: python Code/preprocess_data.py
     deps:
-    - Code/preprocess_tweets_data.py
-    - data/raw/tweets.csv
+    - Code/preprocess_data.py
+    - data/raw/habibi.csv
     params:
     - prepare.remove_stopwords
     - prepare.remove_shadda
@@ -15,13 +15,13 @@ stages:
     - prepare.remove_nonarabic
     - prepare.stemming
     outs:
-    - data/processed/tweets.csv
+    - data/processed/habibi.csv
   train:
     cmd: python Code/train.py
     deps:
     - Code/text_vectorization.py
     - Code/train.py
-    - data/processed/tweets.csv
+    - data/processed/habibi.csv
     params:
     - train.batch_size
     - train.dense_units

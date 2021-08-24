@@ -57,12 +57,12 @@ def plot_training_history(_history):
 data = prepare_data()
 data = data.sample(frac=1).reset_index(drop=True)
 
-print(f'class_count:\n{data["Class"].value_counts()}')
+print(f'class_count:\n{data["Label"].value_counts()}')
 
-data['Class'] = data['Class'].replace({'happiness': 1.0, 'sadness': 0.0})
+data['Label'] = data['Label'].replace({'Happy': 1.0, 'Sad': 0.0})
 
-x = np.array(list(data['Tweet'])).astype(str)
-y = np.array(list(data['Class']))
+x = np.array(list(data['Lyrics'])).astype(str)
+y = np.array(list(data['Label']))
 
 max_len = max([len(item) for item in x])
 

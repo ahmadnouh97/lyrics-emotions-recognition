@@ -1,14 +1,14 @@
 schema: '2.0'
 stages:
   prepare:
-    cmd: python Code/preprocess_tweets_data.py
+    cmd: python Code/preprocess_data.py
     deps:
-    - path: Code/preprocess_tweets_data.py
-      md5: 8c67babbcc16264953e391c6aaca88e5
-      size: 1745
-    - path: data/raw/tweets.csv
-      md5: 384386e393d97a66a2ea566e6e2377e1
-      size: 16381741
+    - path: Code/preprocess_data.py
+      md5: fea6be896222bf10a8ba2178bcc50a42
+      size: 1759
+    - path: data/raw/habibi.csv
+      md5: d65d600f8d986499abde32d447bf2d71
+      size: 1035390
     params:
       params.yaml:
         prepare.normalize: 0
@@ -21,9 +21,9 @@ stages:
         prepare.remove_tatweel: 1
         prepare.stemming: 0
     outs:
-    - path: data/processed/tweets.csv
-      md5: 2a6c5eaa5ecf0387bfadfc1215e8258e
-      size: 6024390
+    - path: data/processed/habibi.csv
+      md5: 4ab44873287c19f5f719766e37a99c58
+      size: 988977
   train:
     cmd: python Code/train.py
     deps:
@@ -31,11 +31,11 @@ stages:
       md5: 7d25e067c67da8553f841b9c769fcc89
       size: 1545
     - path: Code/train.py
-      md5: fa96442823a72768597753db5212f76b
-      size: 3679
-    - path: data/processed/tweets.csv
-      md5: 2a6c5eaa5ecf0387bfadfc1215e8258e
-      size: 6024390
+      md5: 6a4eed05560e20c83fcbd6ab6b78218a
+      size: 3672
+    - path: data/processed/habibi.csv
+      md5: 4ab44873287c19f5f719766e37a99c58
+      size: 988977
     params:
       params.yaml:
         train.batch_size: 32
@@ -43,10 +43,10 @@ stages:
         - 64
         train.dense_units:
         - 64
-        train.dropout_factor: 0.2
+        train.dropout_factor: 0
         train.embedding_dim: 64
-        train.epochs: 15
-        train.hidden_activation: tanh
+        train.epochs: 100
+        train.hidden_activation: relu
         train.input_length: 200
         train.learning_rate: 0.0001
         train.regularization_factor: 0.001
@@ -54,8 +54,8 @@ stages:
         train.vocab_size: 10000
     outs:
     - path: model/lyrics_model
-      md5: 7550724804b2bfa18b3aa6edac31889e.dir
-      size: 16212219
+      md5: 4b247b6927186862a3120432851c0050.dir
+      size: 10349545
       nfiles: 4
   evaluate:
     cmd: python Code/evaluate.py
@@ -67,37 +67,37 @@ stages:
       md5: b9c2383541a44f6efb7b21e1016d985d
       size: 144998
     - path: model/lyrics_model
-      md5: 7550724804b2bfa18b3aa6edac31889e.dir
-      size: 16212219
+      md5: 4b247b6927186862a3120432851c0050.dir
+      size: 10349545
       nfiles: 4
     outs:
     - path: metrics/f1_score.json
-      md5: 727b106bd71a8b9aa7108db322f5f366
+      md5: 0c3f9bf7a0016f61b27b1323edd18fd1
       size: 32
     - path: metrics/happy_f1_score.json
-      md5: 157b5d96e403502bd608945c6e4d3042
+      md5: 64fe29efce889777c7f84848ad0348d5
       size: 32
     - path: metrics/happy_precision.json
-      md5: 68b58aed0ba357c2231186f287c6d0c6
+      md5: d0d087cd9becf8b7e32b03ce0ccc955a
       size: 33
     - path: metrics/happy_recall.json
-      md5: c34712de663889ba2c7f9e825a2697ad
+      md5: 98d606df6c1b187279060fefc57fc769
       size: 16
     - path: metrics/precision.json
-      md5: c82fb6ed7c17b3a4eeca34917e18a67f
+      md5: bf72eab2b2c3d1732e7c45217ff17bf1
       size: 32
     - path: metrics/recall.json
-      md5: e4c186fd2dfd95dc03519921771f7e55
+      md5: fd5a0c51ab73c4861044a38b755ac5c4
       size: 18
     - path: metrics/sad_f1_score.json
-      md5: 3cd359c76ac4624933435c0a10854c17
+      md5: 39ab5039236b35c95156e62fa15ef295
       size: 32
     - path: metrics/sad_precision.json
-      md5: 11da271b22db97ec308060f411e681c5
-      size: 20
+      md5: d8c5e00cc9b9ea00ad5da8481eb20e96
+      size: 33
     - path: metrics/sad_recall.json
-      md5: 5ae5602a55335249ae79dce65aedb40f
+      md5: 9b7a4f68d7018d708f784fb16374e568
       size: 16
     - path: plots/classes.csv
-      md5: aa39e2f2be781cd16ce301b791dffbc5
-      size: 1138
+      md5: 9ba105c6d1d0686a9705ac93bd07bbc9
+      size: 1096

@@ -14,10 +14,10 @@ train:
   embedding_dim: 64
   learning_rate: 0.0001
   validation_split: 0.2
-  epochs: 15
+  epochs: 100
   batch_size: 32
   bi_lstm_units: [64]
   dense_units: [64]
-  hidden_activation: "tanh"
+  hidden_activation: "relu"
   regularization_factor: 0.001
-  dropout_factor: 0.2
+  dropout_factor: 0

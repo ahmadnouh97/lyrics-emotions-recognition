@@ -3,9 +3,9 @@ import os
 
 class Config:
     RAW_DATA_DIR = os.path.join('data', 'raw')
-    RAW_DATA_PATH = os.path.join('data', 'raw', 'tweets.csv')
+    RAW_DATA_PATH = os.path.join('data', 'raw', 'habibi.csv')
     PROCESSED_DATA_DIR = os.path.join('data', 'processed')
-    PROCESSED_DATA_PATH = os.path.join(PROCESSED_DATA_DIR, 'tweets.csv')
+    PROCESSED_DATA_PATH = os.path.join(PROCESSED_DATA_DIR, 'habibi.csv')
     EVAL_DATA_DIR = os.path.join('data', 'eval')
     EVAL_DATA_PATH = os.path.join(EVAL_DATA_DIR, 'eval.json')
 
