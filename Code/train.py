@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
-import tensorflow as tf
-import tensorflow_addons as tfa
+import pyarabic.araby as ar
+# import tensorflow as tf
 import json
-
+import pickle as pkl
 # setup gpu
-physical_devices = tf.config.experimental.list_physical_devices('GPU')
-print("Num GPUs Available: ", physical_devices)
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
+# physical_devices = tf.config.experimental.list_physical_devices('GPU')
+# print("Num GPUs Available: ", physical_devices)
+# tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # import tensorflow_addons as tfa
 from sklearn.model_selection import train_test_split
@@ -15,11 +15,17 @@ import os
 import sys
 import yaml
 import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
 
 sys.path.append(os.path.abspath('.'))
 from Code.config import Config
-from Code.text_vectorization import standardize_ar_text, split_ar_text
-from Code.models import build_cnn_model
+from Code.preprocessing import stop_words, process_text
+# from Code.text_vectorization import standardize_ar_text, split_ar_text
+# from Code.models import build_cnn_model
 params = yaml.safe_load(open(Config.PARAMS_PATH))['train']
 
 # os.makedirs(Config.TENSORBOARD_DIR, exist_ok=True)
@@ -61,58 +67,35 @@ print(f'class_count:\n{data["Label"].value_counts()}')
 
 data['Label'] = data['Label'].replace({'Happy': 1.0, 'Sad': 0.0})
 
-x = np.array(list(data['Lyrics'])).astype(str)
-y = np.array(list(data['Label']))
+lyrics = np.array(list(data['Lyrics'])).astype(str)
+labels = np.array(list(data['Label']))
 
-max_len = max([len(item) for item in x])
+# max_len = max([len(item) for item in x])
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-print(f'x = {len(x)}')
+# print(f'x = {len(x)}')
 
-text2vec_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(
-    max_tokens=int(params['vocab_size']),
-    standardize=standardize_ar_text,
-    split=split_ar_text,
-    output_sequence_length=int(params['input_length'])
-)
+tfidf = TfidfVectorizer(
+    sublinear_tf=True,
+    min_df=5,
+    norm='l2',
+    encoding='utf-8',
+    ngram_range=(1, 2),
+    tokenizer=ar.tokenize,
+    stop_words=stop_words)
+x = lyrics
+# x = tfidf.fit_transform(lyrics).toarray()
+y = labels
 
-text2vec_layer.adapt(x)
 
-with tf.device('/GPU:0'):
-    model = build_cnn_model(
-        text2vec_layer,
-        vocab_size=int(params['vocab_size']),
-        embedding_dim=int(params['embedding_dim']),
-        cnn_units=list(params['cnn_units']),
-        cnn_kernels=list(params['cnn_kernels']),
-        dense_units=list(params['dense_units']),
-        hidden_activation=str(params['hidden_activation']),
-        regularization_factor=float(params['regularization_factor']),
-        dropout_factor=float(params['dropout_factor'])
-    )
-    print('model created')
-    model.compile(
-        loss='binary_crossentropy',
-        optimizer=tf.keras.optimizers.Adam(learning_rate=float(params['learning_rate'])),
-        metrics=[
-            'accuracy'
-        ]
-    )
-    early_stopping_cp = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
-                                                         patience=5, restore_best_weights=True)
+classifier = Pipeline(steps=[
+    ('tfidf', tfidf),
+    ('cls', LogisticRegression())
+])
 
-    history = model.fit(
-        x,
-        y,
-        validation_split=float(params['validation_split']),
-        epochs=int(params['epochs']),
-        batch_size=int(params['batch_size']),
-        callbacks=[
-            early_stopping_cp
-        ]
-    )
+classifier.fit(x, y)
 
-    model.save(Config.MODEL_PATH)
-    plot_training_history(history)
+with open(Config.MODEL_PATH, 'wb') as file:
+    pkl.dump(classifier, file)
 

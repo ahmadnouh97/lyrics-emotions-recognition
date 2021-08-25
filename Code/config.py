@@ -10,7 +10,7 @@ class Config:
     EVAL_DATA_PATH = os.path.join(EVAL_DATA_DIR, 'eval.json')
 
     PARAMS_PATH = os.path.join('params.yaml')
-    MODEL_PATH = os.path.join('model', 'lyrics_model')
+    MODEL_PATH = os.path.join('model', 'lyrics_model.pkl')
     METRICS_DIR = os.path.join('metrics')
 
     PLOT_DIR = os.path.join('plots')

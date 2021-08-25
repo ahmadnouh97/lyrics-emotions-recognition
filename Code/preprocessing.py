@@ -23,8 +23,31 @@ ARABIC_PUNCTUATIONS = '''`÷×؛<>_()*&^%][،/:"؟.,'{}~¦+|!”…“–»«•
 ENGLISH_PUNCTUATIONS = string.punctuation
 ENGLISH_NUMBER = '0123456789'
 PUNCTUATIONS = ARABIC_PUNCTUATIONS + ENGLISH_PUNCTUATIONS + ENGLISH_NUMBER
+stop_words_to_keep = {
+    'لا',
+    'فلا',
+    'ولا',
+    'لكيلا',
+    'ليس',
+    'فليس',
+    'وليس',
+    'غير',
+    'فغير',
+    'وغير',
+    'لغير',
+    'لم',
+    'ولم',
+    'فلم',
+    'لما',
+    'لن',
+    'فلن',
+    'ولن',
+    'ما',
+    'فما',
+    'وما'
+}
+stop_words = ['(' + word + ')' for word in list(stp.stopwords_list()) if word not in stop_words_to_keep]
 
-stop_words = ['(' + word + ')' for word in list(stp.stopwords_list())]
 STOPWORD_PATTERN = r'\b(' + r'|'.join(list(stp.stopwords_list())) + r')\b\s*'
 
 

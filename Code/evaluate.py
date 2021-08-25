@@ -3,14 +3,13 @@ import sys
 import yaml
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import json
+import pickle as pkl
 from tqdm import tqdm
 from sklearn.metrics import classification_report, f1_score, precision_score, recall_score, accuracy_score
 
 sys.path.append(os.path.abspath('.'))
 from Code.config import Config
-from Code.text_vectorization import standardize_ar_text, split_ar_text
 from Code.preprocessing import process_text
 
 with open(Config.PARAMS_PATH) as f:
@@ -46,11 +45,19 @@ data['Lyrics'] = processed_lyrics
 x_test = np.array(list(data['Lyrics']))
 y_test = np.array(list(data['Label']))
 
-model = tf.keras.models.load_model(Config.MODEL_PATH)
+with open(Config.MODEL_PATH, 'rb') as file:
+    classifier = pkl.load(file)
 
-predictions = model.predict(x_test)
+# predictions = classifier.predict_proba(x_test)
+predictions = classifier.predict(x_test)
+print(predictions)
+y_pred = ['Happy' if val == 1 else 'Sad' for val in predictions]
+# y_pred = ['Happy' if np.argmax(val) else 'Sad' for val in predictions]
+# model = tf.keras.models.load_model(Config.MODEL_PATH)
 
-y_pred = ['Happy' if val >= 0.5 else 'Sad' for val in predictions.reshape(-1)]
+# predictions = model.predict(x_test)
+
+# y_pred = ['Happy' if val >= 0.5 else 'Sad' for val in predictions.reshape(-1)]
 
 
 predictions_dict = {
