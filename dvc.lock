@@ -7,8 +7,8 @@ stages:
       md5: fea6be896222bf10a8ba2178bcc50a42
       size: 1759
     - path: data/raw/habibi.csv
-      md5: d65d600f8d986499abde32d447bf2d71
-      size: 1035390
+      md5: dfff53e4fbf7b837acfaa4eec9926153
+      size: 1096892
     params:
       params.yaml:
         prepare.normalize: 1
@@ -19,11 +19,11 @@ stages:
         prepare.remove_stopwords: 1
         prepare.remove_tashkeel: 1
         prepare.remove_tatweel: 1
-        prepare.stemming: 0
+        prepare.stemming: 1
     outs:
     - path: data/processed/habibi.csv
-      md5: 55a4237e6b8bc180da5555c2dc94e99f
-      size: 851685
+      md5: 231197d6bc68f6fe27724476f7504dff
+      size: 668116
   train:
     cmd: python Code/train.py
     deps:
@@ -31,76 +31,81 @@ stages:
       md5: 7d25e067c67da8553f841b9c769fcc89
       size: 1545
     - path: Code/train.py
-      md5: 1a94dcc6aa490eae2d38793b4fc29895
-      size: 3706
+      md5: 0ddc4e0cd40018bed6c9fb849efb6916
+      size: 3844
     - path: data/processed/habibi.csv
-      md5: 55a4237e6b8bc180da5555c2dc94e99f
-      size: 851685
+      md5: 231197d6bc68f6fe27724476f7504dff
+      size: 668116
     params:
       params.yaml:
-        train.batch_size: 32
+        train.batch_size: 50
         train.cnn_kernels:
         - 3
         train.cnn_units:
-        - 32
+        - 256
         train.dense_units:
-        - 32
-        - 32
-        train.dropout_factor: 0.2
+        - 128
+        train.dropout_factor: 0
         train.embedding_dim: 100
-        train.epochs: 100
+        train.epochs: 64
         train.hidden_activation: relu
         train.input_length: 200
-        train.learning_rate: 0.0003
+        train.learning_rate: 0.0001
         train.regularization_factor: 0.001
         train.validation_split: 0.2
         train.vocab_size: 10000
     outs:
     - path: model/lyrics_model
-      md5: 4632e23d723a837d97a96c4c94ee7c76.dir
-      size: 12714302
+      md5: d8ba406e1707bb251be59db82a2f96e8.dir
+      size: 13755580
       nfiles: 4
   evaluate:
     cmd: python Code/evaluate.py
     deps:
     - path: Code/evaluate.py
-      md5: 6db043f741fb422ba401b54912636aa6
-      size: 4504
+      md5: 7e4ea7dc7e76aeedead9ff8e870c9d64
+      size: 4927
     - path: data/eval/eval.json
       md5: b9c2383541a44f6efb7b21e1016d985d
       size: 144998
     - path: model/lyrics_model
-      md5: 4632e23d723a837d97a96c4c94ee7c76.dir
-      size: 12714302
+      md5: d8ba406e1707bb251be59db82a2f96e8.dir
+      size: 13755580
       nfiles: 4
     outs:
+    - path: metrics/accuracy.json
+      md5: 7a20a096b2423d662aa7e9b860b87417
+      size: 18
     - path: metrics/f1_score.json
-      md5: 17e4b6e012a496add60ec0a7901df2d0
+      md5: e37e905093b6bf1eec26b3a94832d7f5
       size: 32
     - path: metrics/happy_f1_score.json
-      md5: bc2db36983afe36ba812e167b662e296
+      md5: 40d683a01481e4361447a00dc3d028ab
       size: 32
     - path: metrics/happy_precision.json
-      md5: b361d76239b793e7f084ee806cf17b2c
+      md5: 5a79271708deeb92e9d86c50aa1710a1
       size: 33
     - path: metrics/happy_recall.json
-      md5: 1f14b6df10362e6cbd87f4eeda7918d8
+      md5: 57b8f3574f5e3896a82d4030d9f2ffe1
       size: 16
     - path: metrics/precision.json
-      md5: 03fbd7c6164ee01981dadd3cbb3505ad
+      md5: 9c022ad8a6d9335303bf128a0b901159
       size: 32
     - path: metrics/recall.json
-      md5: a26d444e516cd0da452450248cb3c276
+      md5: 685bfe645b6736ee049964cd81a9b9bf
       size: 18
+    - path: metrics/roc_auc.json
+      md5: 75dca7793791ded8f2fed572c2446e23
+      size: 25
     - path: metrics/sad_f1_score.json
-      md5: fac48799eb6f2ddd9dcb059bdbdca1e1
+      md5: ec89a9be1da7d5419dd96a89676d3d63
       size: 32
     - path: metrics/sad_precision.json
-      md5: 2bcf4909b3df077c9d63f0bb71e053ca
+      md5: 886b54e6fd3936c0f814a36729570e77
       size: 33
     - path: metrics/sad_recall.json
-      md5: 25250e1bed56eb0f712d80a36a5321b9
+      md5: 71bb11a09d2360238f7e780406ac3ba9
       size: 16
     - path: plots/classes.csv
-      md5: 97398f9bbe57cb7d945a0b391bb55dff
-      size: 1144
+      md5: e4f21e74b43cf2ecdb656685c0692649
+      size: 1126

@@ -6,7 +6,8 @@ import pandas as pd
 import tensorflow as tf
 import json
 from tqdm import tqdm
-from sklearn.metrics import classification_report, f1_score, precision_score, recall_score, accuracy_score
+from sklearn.metrics import classification_report, f1_score, precision_score, recall_score, accuracy_score, \
+    roc_auc_score
 
 sys.path.append(os.path.abspath('.'))
 from Code.config import Config
@@ -41,7 +42,7 @@ with tqdm(total=len(data)) as p_bar:
         p_bar.update(1)
 
 data['Lyrics'] = processed_lyrics
-# data['Label'] = data['Label'].replace({'Happy': 1.0, 'Sad': 0.0})
+y_test_num = np.array(list(data['Label'].replace({'Happy': 1.0, 'Sad': 0.0})))
 
 x_test = np.array(list(data['Lyrics']))
 y_test = np.array(list(data['Label']))
@@ -51,7 +52,6 @@ model = tf.keras.models.load_model(Config.MODEL_PATH)
 predictions = model.predict(x_test)
 
 y_pred = ['Happy' if val >= 0.5 else 'Sad' for val in predictions.reshape(-1)]
-
 
 predictions_dict = {
     'actual': y_test,
@@ -63,7 +63,7 @@ class_report = classification_report(y_test, y_pred, output_dict=True)
 print(class_report)
 
 accuracy = {
-    'f1-accuracy': accuracy_score(y_test, y_pred)
+    'accuracy': accuracy_score(y_test, y_pred)
 }
 
 happy_f1_metrics = {
@@ -102,6 +102,14 @@ total_recall_metrics = {
     'f1-score': recall_score(y_test, y_pred, average='macro')
 }
 
+print(y_test_num)
+
+print(predictions.reshape(-1))
+
+roc_auc_metrics = {
+    'roc_auc_score': roc_auc_score(y_test_num, predictions.reshape(-1), average='macro')
+}
+
 os.makedirs(Config.METRICS_DIR, exist_ok=True)
 
 with open(os.path.join(Config.METRICS_DIR, 'f1_score.json'), 'w') as file:
@@ -133,6 +141,12 @@ with open(os.path.join(Config.METRICS_DIR, 'sad_precision.json'), 'w') as file:
 
 with open(os.path.join(Config.METRICS_DIR, 'sad_recall.json'), 'w') as file:
     json.dump(sad_recall_metrics, file)
+
+with open(os.path.join(Config.METRICS_DIR, 'roc_auc.json'), 'w') as file:
+    json.dump(roc_auc_metrics, file)
+
+with open(os.path.join(Config.METRICS_DIR, 'accuracy.json'), 'w') as file:
+    json.dump(accuracy, file)
 
 
 # ---------------------------------------------------------------------------

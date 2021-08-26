@@ -8,3 +8,5 @@
 /sad_f1_score.json
 /sad_precision.json
 /sad_recall.json
+/roc_auc.json
+/accuracy.json

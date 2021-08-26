@@ -99,8 +99,10 @@ with tf.device('/GPU:0'):
             'accuracy'
         ]
     )
+
+    tf.keras.utils.plot_model(model, to_file=os.path.join(Config.PLOT_DIR, 'model_arc.png'), show_shapes=True, show_layer_names=True)
     early_stopping_cp = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min',
-                                                         patience=5, restore_best_weights=True)
+                                                         patience=10, restore_best_weights=True)
 
     history = model.fit(
         x,
