@@ -7,7 +7,7 @@ prepare:
   normalize: 1
   remove_repeats: 1
   remove_nonarabic: 1
-  stemming: 0
+  stemming: 1
 train:
   vocab_size: 10000
   input_length: 200

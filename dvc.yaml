@@ -37,11 +37,11 @@ stages:
     - train.regularization_factor
     - train.dropout_factor
     outs:
-    - model/lyrics_model
+    - model/lyrics_model.pkl
   evaluate:
     cmd: python Code/evaluate.py
     deps:
-      - model/lyrics_model
+      - model/lyrics_model.pkl
       - data/eval/eval.json
       - Code/evaluate.py
     metrics:
@@ -54,6 +54,8 @@ stages:
     - metrics/sad_f1_score.json
     - metrics/sad_precision.json
     - metrics/sad_recall.json
+    - metrics/roc_auc.json
+    - metrics/accuracy.json
     plots:
     - plots/classes.csv:
         template: confusion
