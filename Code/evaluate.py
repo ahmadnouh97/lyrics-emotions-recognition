@@ -95,11 +95,11 @@ total_f1_metrics = {
 }
 
 total_precision_metrics = {
-    'f1-score': precision_score(y_test, y_pred, average='macro')
+    'precision': precision_score(y_test, y_pred, average='macro')
 }
 
 total_recall_metrics = {
-    'f1-score': recall_score(y_test, y_pred, average='macro')
+    'recall': recall_score(y_test, y_pred, average='macro')
 }
 
 print(y_test_num)
