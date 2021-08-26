@@ -91,7 +91,7 @@ y = labels
 
 classifier = Pipeline(steps=[
     ('tfidf', tfidf),
-    ('cls', LogisticRegression())
+    ('cls', LinearSVC(C=0.1))
 ])
 
 classifier.fit(x, y)
