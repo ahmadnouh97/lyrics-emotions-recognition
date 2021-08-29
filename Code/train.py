@@ -91,7 +91,7 @@ y = labels
 
 classifier = Pipeline(steps=[
     ('tfidf', tfidf),
-    ('cls', LinearSVC(C=0.1))
+    ('cls', MultinomialNB())
 ])
 
 classifier.fit(x, y)
