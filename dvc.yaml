@@ -1,0 +1,51 @@
+stages:
+  prepare:
+    cmd: python Code/preprocess_tweets_data.py
+    deps:
+    - Code/preprocess_tweets_data.py
+    - data/raw/tweets.csv
+    params:
+    - prepare.remove_stopwords
+    - prepare.remove_shadda
+    - prepare.remove_tashkeel
+    - prepare.remove_tatweel
+    - prepare.remove_punc
+    - prepare.normalize
+    - prepare.remove_repeats
+    - prepare.remove_nonarabic
+    - prepare.stemming
+    outs:
+    - data/processed/tweets.csv
+  train:
+    cmd: python Code/train.py
+    deps:
+    - Code/text_vectorization.py
+    - Code/train.py
+    - data/processed/tweets.csv
+    params:
+    - train.batch_size
+    - train.dense_01_units
+    - train.dense_02_units
+    - train.embedding_dim
+    - train.epochs
+    - train.hidden_activation
+    - train.input_length
+    - train.learning_rate
+    - train.lstm_01_units
+    - train.lstm_02_units
+    - train.validation_split
+    - train.vocab_size
+    - train.regularization_factor
+    - train.dropout_factor
+    outs:
+    - model/tweets_model
+    metrics:
+    - metrics/f1_score.json
+    - metrics/precision.json
+    - metrics/recall.json
+    - metrics/happy_f1_score.json
+    - metrics/happy_precision.json
+    - metrics/happy_recall.json
+    - metrics/sad_f1_score.json
+    - metrics/sad_precision.json
+    - metrics/sad_recall.json
